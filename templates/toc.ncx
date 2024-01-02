@@ -8,6 +8,7 @@
   <docTitle>
     <text>{{toc_name}}</text>
   </docTitle>
+  {{toc_author}}
   <navMap>
 {{nav_points}}
   </navMap>
