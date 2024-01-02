@@ -269,16 +269,16 @@ impl<Z: Zip> EpubBuilder<Z> {
     }
 
     /// Tells whether fields should be HTML-escaped.
-    /// 
+    ///
     /// * `true`: fields such as titles, description, and so on will be HTML-escaped everywhere (default)
-    /// * `false`: fields will be left as is (letting you in charge of making 
+    /// * `false`: fields will be left as is (letting you in charge of making
     /// sure they do not contain anything illegal, e.g. < and > characters)
     pub fn escape_html(&mut self, val: bool) {
         self.escape_html = val;
     }
 
     /// Sets the language of the EPUB
-    /// 
+    ///
     /// This is quite important as EPUB renderers rely on it
     /// for e.g. hyphenating words.
     pub fn set_lang<S: Into<String>>(&mut self, value: S) {
@@ -629,7 +629,7 @@ impl<Z: Zip> EpubBuilder<Z> {
         }
 
         let data = {
-            let mut authors: Vec<_> = vec!{};
+            let mut authors: Vec<_> = vec![];
             for (i, author) in self.metadata.author.iter().enumerate() {
                 let author = upon::value! {
                     id_attr: html_escape::encode_double_quoted_attribute(&i.to_string()),
@@ -649,17 +649,18 @@ impl<Z: Zip> EpubBuilder<Z> {
                 items: common::indent(items.join("\n"), 2), // Not escaped: XML content
                 itemrefs: common::indent(itemrefs.join("\n"), 2), // Not escaped: XML content
                 date_modified: html_escape::encode_text(&date_modified.to_string()),
-                uuid: html_escape::encode_text(&uuid), 
+                uuid: html_escape::encode_text(&uuid),
                 guide: common::indent(guide.join("\n"), 2), // Not escaped: XML content
                 date_published: if let Some(date) = date_published { date.to_string() } else { String::new() },
             }
         };
 
-        let mut res:Vec<u8> = vec![];
+        let mut res: Vec<u8> = vec![];
         match self.version {
             EpubVersion::V20 => templates::v2::CONTENT_OPF.render(&data).to_writer(&mut res),
             EpubVersion::V30 => templates::v3::CONTENT_OPF.render(&data).to_writer(&mut res),
-        }.wrap_err("could not render template for content.opf")?;
+        }
+        .wrap_err("could not render template for content.opf")?;
 
         Ok(res)
     }
@@ -671,14 +672,18 @@ impl<Z: Zip> EpubBuilder<Z> {
 
         nav_points.push_str(&self.toc.render_epub(self.escape_html));
 
-        if ! &self.metadata.author.is_empty() {
+        if !&self.metadata.author.is_empty() {
             for author in self.metadata.author.iter() {
                 toc_author.push_str("  <docAuthor>\n");
                 toc_author.push_str("    <text>");
-                toc_author.push_str(common::encode_html(author.as_str(), self.escape_html).to_string().as_str());
+                toc_author.push_str(
+                    common::encode_html(author.as_str(), self.escape_html)
+                        .to_string()
+                        .as_str(),
+                );
                 toc_author.push_str("</text>\n");
-                toc_author.push_str("  </docAuthor>\n");
-        }   
+                toc_author.push_str("  </docAuthor>");
+            }
         }
 
         let data = upon::value! {
@@ -734,7 +739,7 @@ impl<Z: Zip> EpubBuilder<Z> {
             }
         }
 
-        let data = upon::value!{
+        let data = upon::value! {
             content: content, // Not escaped: XML content
             toc_name: common::encode_html(&self.metadata.toc_name, self.escape_html),
             generator_attr: html_escape::encode_double_quoted_attribute(&self.metadata.generator),
@@ -750,12 +755,13 @@ impl<Z: Zip> EpubBuilder<Z> {
                 String::new()
             },
         };
-        
+
         let mut res: Vec<u8> = vec![];
         match self.version {
             EpubVersion::V20 => templates::v2::NAV_XHTML.render(&data).to_writer(&mut res),
             EpubVersion::V30 => templates::v3::NAV_XHTML.render(&data).to_writer(&mut res),
-        }.wrap_err("error rendering nav.xhtml template")?;
+        }
+        .wrap_err("error rendering nav.xhtml template")?;
         Ok(res)
     }
 }
