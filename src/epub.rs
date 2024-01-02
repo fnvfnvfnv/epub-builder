@@ -674,7 +674,7 @@ impl<Z: Zip> EpubBuilder<Z> {
 
         if !&self.metadata.author.is_empty() {
             for author in self.metadata.author.iter() {
-                toc_author.push_str("  <docAuthor>\n");
+                toc_author.push_str("<docAuthor>\n");
                 toc_author.push_str("    <text>");
                 toc_author.push_str(
                     common::encode_html(author.as_str(), self.escape_html)
